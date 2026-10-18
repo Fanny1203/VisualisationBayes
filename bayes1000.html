@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probabilités Conditionnelles — Fréquences Naturelles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f7;
+    --border: #e2e2e2;
+    --text: #1a1a1a;
+    --muted: #999;
+    --c1: #0072B2;
+    --c2: #2b8cc4;
+    --c3: #D55E00;
+    --c4t: #CC8A00;
+    --accent: #0072B2;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  header span {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 30fr 70fr;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .panel {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .panel-left { border-right: 1px solid var(--border); }
+
+  .section-label {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.75rem;
+    color: #333;
+    margin-bottom: 2px;
+  }
+
+  .name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .name-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .name-field label {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.75rem;
+    color: #333;
+  }
+
+  input[type=text] {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    padding: 5px 9px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .params {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .param-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .param-label {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    color: #333;
+  }
+
+  input[type=number] {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 3px;
+    outline: none;
+    width: 68px;
+    text-align: right;
+    transition: border-color 0.2s;
+  }
+  input[type=number]:focus { border-color: var(--accent); }
+  input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+
+  .side-section + .side-section { border-top: 1px solid var(--border); padding-top: 14px; }
+  .section-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .name-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+  .name-grid label { font-size: 0.8rem; font-weight: 600; color: #333; }
+  .param-table { border-collapse: collapse; font-size: 0.8rem; }
+  .param-table th { font-weight: 600; padding: 2px 4px 6px; text-align: center; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .param-table td { padding: 3px 4px; }
+  .param-table .pt-label { color: #333; padding-right: 10px; white-space: nowrap; }
+  .param-table .pt-sep { text-align: center; color: #666; padding: 0 2px; }
+  .param-table input[type=number] { width: 60px; }
+  .auto-val {
+    display: inline-block; width: 60px; padding: 4px 8px; text-align: right;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: #666;
+  }
+  .emoji-gallery { margin-top: 6px; font-size: 0.75rem; color: #555; }
+  .emoji-gallery summary { cursor: pointer; }
+  .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 2px; margin-top: 6px; }
+  .emoji-btn { background: none; border: 1px solid transparent; border-radius: 4px; font-size: 1.2rem; line-height: 1; padding: 4px 0; cursor: pointer; }
+  .emoji-btn:hover { background: var(--bg2); border-color: var(--border); }
+
+  canvas { display: block; width: 100%; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .stat-box {
+    background: var(--bg2);
+    border-radius: 4px;
+    border-left: 3px solid;
+    padding: 7px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-box .s-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .stat-box .s-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.0rem;
+    font-weight: 600;
+  }
+
+  .stat-box .s-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .bayes-card {
+    background: #f3f8fc;
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    padding: 13px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bayes-card .b-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .bayes-card .b-formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: #666;
+  }
+
+  .bayes-card .b-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 6px 16px;
+    margin-bottom: -1px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .tab-pane { display: flex; flex-direction: column; gap: 14px; }
+  .tab-pane.hidden { display: none !important; }
+
+  .btn-row { display: flex; gap: 6px; }
+
+  .highlight-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: #555;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .highlight-btn:hover { border-color: #aaa; color: #555; }
+  #highlightEBtn.active  { border-color: var(--accent); color: var(--accent); background: #eef6fb; }
+  #highlightHBtn.active  { border-color: #d97706;       color: #d97706;       background: #fffbf0; }
+
+  .show-e-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+  }
+  input[type=checkbox] {
+    accent-color: var(--accent);
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+  }
+
+  /* Asymmetry card */
+  .asym-card {
+    background: #fffbf0;
+    border: 1px solid #f0c060;
+    border-radius: 5px;
+    padding: 11px 14px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .asym-card.visible { display: flex; }
+
+  .asym-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .asym-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .asym-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .asym-direction {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    color: #bbb;
+    letter-spacing: 0.06em;
+  }
+
+  .asym-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.0rem;
+    font-weight: 600;
+  }
+
+  .asym-frac {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: #aaa;
+  }
+
+  .asym-tree .asym-val  { color: #0072B2; }
+  .asym-bayes .asym-val { color: #1a1a1a; }
+
+  .asym-neq {
+    font-size: 1.4rem;
+    color: #d97706;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  /* Formules diagramme */
+  .dfrac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1.25;
+  }
+  .dfrac .dn { border-bottom: 1px solid #555; padding-bottom: 1px; white-space: nowrap; }
+  .dfrac .dd { padding-top: 1px; white-space: nowrap; }
+  .formula-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Probabilités Conditionnelles</h1>
+  <span>Visualisation sur 1 000 individus</span>
+</header>
+
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="panel panel-left">
+
+    <div class="side-section">
+      <div class="section-title">Noms des événements</div>
+      <div class="name-grid">
+        <label for="nameH">H</label>
+        <input type="text" id="nameH" value="Malade" maxlength="18">
+        <label for="nameE">O</label>
+        <input type="text" id="nameE" value="Test +" maxlength="18">
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="section-title">Paramètres (en %)</div>
+      <table class="param-table">
+        <tr>
+          <td></td>
+          <th id="hdr-H"></th><td></td><th id="hdr-nH"></th>
+        </tr>
+        <tr>
+          <td class="pt-label">A priori</td>
+          <td><input type="number" id="pH" min="1" max="99" step="1" value="10"></td>
+          <td class="pt-sep">:</td>
+          <td><span class="auto-val" id="pnH-auto">90</span></td>
+        </tr>
+        <tr>
+          <td class="pt-label" id="lik-label">Vraisemblance</td>
+          <td><input type="number" id="pEgH" min="1" max="99" step="1" value="90"></td>
+          <td class="pt-sep">:</td>
+          <td><input type="number" id="pEgnH" min="1" max="99" step="1" value="5"></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="side-section">
+      <div class="section-title">Symbole des individus (visualisation)</div>
+      <input type="text" id="emoji" maxlength="8" value="🧍‍♂️" style="width:100%; font-size:1rem;" placeholder="vide = ronds">
+      <details class="emoji-gallery">
+        <summary>Galerie</summary>
+        <div class="emoji-grid">
+        <button type="button" class="emoji-btn">🧍‍♂️</button>
+        <button type="button" class="emoji-btn">🧍‍♀️</button>
+        <button type="button" class="emoji-btn">🧍</button>
+        <button type="button" class="emoji-btn">🧑</button>
+        <button type="button" class="emoji-btn">👨</button>
+        <button type="button" class="emoji-btn">👩</button>
+        <button type="button" class="emoji-btn">👧</button>
+        <button type="button" class="emoji-btn">👦</button>
+        <button type="button" class="emoji-btn">👴</button>
+        <button type="button" class="emoji-btn">👵</button>
+        <button type="button" class="emoji-btn">🧑‍⚕️</button>
+        <button type="button" class="emoji-btn">🧑‍🎓</button>
+        <button type="button" class="emoji-btn">🧑‍🌾</button>
+        <button type="button" class="emoji-btn">🧑‍🍳</button>
+        <button type="button" class="emoji-btn">👮</button>
+        <button type="button" class="emoji-btn">🐟</button>
+        <button type="button" class="emoji-btn">🐄</button>
+        <button type="button" class="emoji-btn">🐑</button>
+        <button type="button" class="emoji-btn">🐖</button>
+        <button type="button" class="emoji-btn">🐔</button>
+        <button type="button" class="emoji-btn">🐕</button>
+        <button type="button" class="emoji-btn">🐈</button>
+        <button type="button" class="emoji-btn">🐝</button>
+        <button type="button" class="emoji-btn">🦆</button>
+        <button type="button" class="emoji-btn">🐸</button>
+        <button type="button" class="emoji-btn">🦋</button>
+        <button type="button" class="emoji-btn">🌱</button>
+        <button type="button" class="emoji-btn">🌳</button>
+        <button type="button" class="emoji-btn">🍎</button>
+        <button type="button" class="emoji-btn">🥕</button>
+        <button type="button" class="emoji-btn">📧</button>
+        <button type="button" class="emoji-btn">📦</button>
+        <button type="button" class="emoji-btn">🚗</button>
+        <button type="button" class="emoji-btn">🚲</button>
+        <button type="button" class="emoji-btn">🏠</button>
+        <button type="button" class="emoji-btn">💊</button>
+        <button type="button" class="emoji-btn">💡</button>
+        <button type="button" class="emoji-btn">📱</button>
+        <button type="button" class="emoji-btn">💰</button>
+        <button type="button" class="emoji-btn">⚽</button>
+        <button type="button" class="emoji-btn">🎲</button>
+        <button type="button" class="emoji-btn">🔑</button>
+        <button type="button" class="emoji-btn">📚</button>
+        <button type="button" class="emoji-btn">⭐</button>
+        <button type="button" class="emoji-btn">❤️</button>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel panel-right">
+
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-viz">Visualisation</button>
+      <button class="tab-btn"        id="tab-tree">Arbre</button>
+      <button class="tab-btn"        id="tab-diag">Diagramme</button>
+    </div>
+
+    <!-- Tab: Visualisation -->
+    <div class="tab-pane" id="pane-viz">
+
+    <div style="display:flex; align-items:center; gap:14px;">
+      <label class="show-e-row">
+        <input type="checkbox" id="showE" autocomplete="off"> Afficher O
+      </label>
+      <label class="show-e-row">
+        <input type="checkbox" id="ordered" autocomplete="off"> Ordonné
+      </label>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:5px;">
+        <input type="number" id="gridCols" min="2" max="200" step="1" value="10" style="width:50px">
+        <span style="font-size:0.8rem; color:#999">×</span>
+        <input type="number" id="gridRows" min="2" max="200" step="1" value="10" style="width:50px">
+        <span class="section-label" id="total-label" style="margin-left:4px;">= 100 individus</span>
+      </div>
+      <div class="btn-row" id="highlightBtns" style="display:none">
+        <button class="highlight-btn" id="highlightEBtn">Isoler E</button>
+        <button class="highlight-btn" id="highlightHBtn">Isoler H</button>
+      </div>
+    </div>
+
+    <canvas id="dot-canvas"></canvas>
+
+    <div id="stats-table" style="display:none"></div>
+
+    <div id="bayes-line" style="display:none; font-size:0.9rem;"></div>
+
+    <div class="asym-card" id="asym-card">
+      <div class="asym-title">Asymétrie de la conditionnelle</div>
+      <div class="asym-row">
+        <div class="asym-item asym-tree">
+          <div class="asym-direction">Lecture arbre →</div>
+          <div class="asym-val" id="asym-pEgH">—</div>
+          <div class="asym-frac" id="asym-frac-EgH">—</div>
+        </div>
+        <div class="asym-neq">≠</div>
+        <div class="asym-item asym-bayes">
+          <div class="asym-direction">Lecture inverse ←</div>
+          <div class="asym-val" id="asym-pHgE">—</div>
+          <div class="asym-frac" id="asym-frac-HgE">—</div>
+        </div>
+      </div>
+    </div><!-- /asym-card -->
+    </div><!-- /pane-viz -->
+
+    <!-- Tab: Arbre -->
+    <div class="tab-pane hidden" id="pane-tree">
+      <div><button class="highlight-btn" id="tree-rev-btn">Renverser l'arbre</button></div>
+      <canvas id="tree-canvas"></canvas>
+    </div>
+
+    <!-- Tab: Diagramme -->
+    <div class="tab-pane hidden" id="pane-diag">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <label class="show-e-row">
+          <input type="checkbox" id="diag-showO" autocomplete="off"> Afficher O
+        </label>
+        <span id="diag-step-lbl" style="font-size:0.72rem; color:var(--muted)"></span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:28px; flex-wrap:wrap;">
+        <div>
+          <canvas id="diag-canvas"></canvas>
+          <div id="diag-f1"></div>
+        </div>
+        <div style="padding-top:28px;">
+          <div id="odds-table"></div>
+          <div id="diag-f4" style="margin-top:14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const S = {
+  pH: 0.10, pEgH: 0.90, pEgnH: 0.05,
+  nameH: 'Malade', nameE: 'Test +',
+  ordered: false,
+  showE: false,
+  highlightE: false,
+  highlightH: false,
+  cols: 10, rows: 10,
+  reversed: false,
+};
+
+// Palette adaptée au daltonisme (Okabe-Ito) : bleus pour H, vermillon/ocre pour non H
+const C = {
+  HE:       '#0072B2',  // H∩E  : bleu foncé
+  HnE:      '#2b8cc4',  // H∩non E : bleu moyen
+  nHE:      '#D55E00',  // non H∩E : vermillon
+  nHnE:     '#CC8A00',  // non H∩non E : ocre
+};
+
+// ─── Compute ─────────────────────────────────────────────────────────────────
+function compute() {
+  const { pH, pEgH, pEgnH } = S;
+  const pnH  = 1 - pH;
+  const pHE  = pH * pEgH;
+  const pHnE = pH * (1 - pEgH);
+  const pnHE = pnH * pEgnH;
+  const pnHnE= pnH * (1 - pEgnH);
+  const pE   = pHE + pnHE;
+  const pHgE = pE > 0 ? pHE / pE : 0;
+  const N = S.cols * S.rows;
+  const counts = [
+    Math.round(pHE * N),
+    Math.round(pHnE * N),
+    Math.round(pnHE * N),
+    0
+  ];
+  counts[3] = N - counts[0] - counts[1] - counts[2];
+  return { pH, pnH, pEgH, pEgnH, pHE, pHnE, pnHE, pnHnE, pE, pHgE, counts, N };
+}
+
+// ─── Draw Tree ────────────────────────────────────────────────────────────────
+function drawTree() {
+  const el = document.getElementById('tree-canvas');
+  const W = Math.min(el.parentElement.clientWidth, 378);   // ≈ 10 cm max
+  const H = 330;
+  el.width  = W * devicePixelRatio;
+  el.height = H * devicePixelRatio;
+  el.style.width  = W + 'px';
+  el.style.height = H + 'px';
+  const ctx = el.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W, H);
+
+  const c    = compute();
+  const hiH  = S.highlightH;
+  const rev  = S.reversed;
+  const nameH = S.nameH || 'H';
+  const nameE = S.nameE || 'E';
+  const nH = 'non ' + nameH;
+  const nE = 'non ' + nameE;
+  const DIM = '#d8d8d8';
+  const NEUTRAL = '#333';
+  const fmt = p => (p * 100).toFixed((p * 100) % 1 ? 1 : 0).replace('.', ',') + ' %';
+
+  const leafW = W * 0.42;
+  const x0 = 14, x2 = W - leafW;
+  const x1 = x0 + (x2 - x0) * 0.46;
+  const yRoot = H / 2;
+  const yN = [H * 0.26, H * 0.74];
+  const yL = [H * 0.11, H * 0.41, H * 0.59, H * 0.89];
+
+  // épaisseur : croît avec la probabilité, mais compressée (racine carrée) pour rester lisible
+  const width = p => 1.5 + 6 * Math.sqrt(p);
+
+  // cat 0=H∩E, 1=H∩non E, 2=non H∩E, 3=non H∩non E
+  const catColor = [C.HE, C.HnE, C.nHE, C.nHnE];
+  const catJoint = [c.pHE, c.pHnE, c.pnHE, c.pnHnE];
+  const catNames = [[nameH, nameE], [nameH, nE], [nH, nameE], [nH, nE]];
+  const isNonH = cat => cat >= 2;
+
+  // Niveau 1 + enfants. p1 = prob. du nœud ; p = prob. conditionnelle (affichée) ;
+  // l'épaisseur du 2e niveau est pondérée par la proba jointe (= p1 × p).
+  const pHgE  = c.pE > 0 ? c.pHE / c.pE : 0;
+  const pHgnE = (1 - c.pE) > 0 ? c.pHnE / (1 - c.pE) : 0;
+  const nodes = rev ? [
+    { text: nameE, p1: c.pE,     color: NEUTRAL, dim: false,
+      kids: [{ p: pHgE,  cat: 0 }, { p: 1 - pHgE,  cat: 2 }] },
+    { text: nE,    p1: 1 - c.pE, color: NEUTRAL, dim: false,
+      kids: [{ p: pHgnE, cat: 1 }, { p: 1 - pHgnE, cat: 3 }] },
+  ] : [
+    { text: nameH, p1: c.pH,  color: C.HE,  dim: false,
+      kids: [{ p: c.pEgH,  cat: 0 }, { p: 1 - c.pEgH,  cat: 1 }] },
+    { text: nH,    p1: c.pnH, color: C.nHE, dim: hiH,
+      kids: [{ p: c.pEgnH, cat: 2 }, { p: 1 - c.pEgnH, cat: 3 }] },
+  ];
+
+  function branch(ax, ay, bx, by, wProb, labelProb, color, dim, labelUp) {
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(bx, by);
+    ctx.strokeStyle = dim ? DIM : '#333';
+    ctx.lineWidth = width(wProb);
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    const t = 0.45;
+    const mx = ax + (bx - ax) * t, my = ay + (by - ay) * t;
+    ctx.font = '600 13px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#fff';
+    const ty = my + (labelUp ? -width(wProb) / 2 - 8 : width(wProb) / 2 + 15);
+    const txt = fmt(labelProb);
+    ctx.strokeText(txt, mx, ty);
+    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.fillText(txt, mx, ty);
+  }
+
+  function nodeBox(x, y, text, color, dim) {
+    ctx.font = '600 13px IBM Plex Sans, sans-serif';
+    const w = ctx.measureText(text).width + 16, h = 24;
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2, y - h / 2, w, h, 6);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = dim ? DIM : color;
+    ctx.stroke();
+    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.textAlign = 'center';
+    ctx.fillText(text, x, y + 5);
+  }
+
+  function leaf(x, y, label, prob, count, color, dim) {
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = dim ? DIM : '#333';
+    ctx.fill();
+    ctx.textAlign = 'left';
+    // réduit la police si le libellé dépasse la place disponible
+    const avail = leafW - 16;
+    let fs = 13;
+    do { ctx.font = `600 ${fs}px IBM Plex Sans, sans-serif`; fs -= 0.5; }
+    while (ctx.measureText(label).width > avail && fs > 8);
+    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.fillText(label, x + 11, y - 2);
+    ctx.font = '11px IBM Plex Mono, monospace';
+    ctx.fillStyle = dim ? '#ccc' : '#555';
+    ctx.fillText(fmt(prob) + ' · n=' + count, x + 11, y + 13);
+  }
+
+  // Racine
+  ctx.beginPath();
+  ctx.arc(x0, yRoot, 6, 0, Math.PI * 2);
+  ctx.fillStyle = '#333';
+  ctx.fill();
+
+  // Branches (d'abord toutes, puis nœuds et feuilles par-dessus)
+  nodes.forEach((n, ni) => {
+    branch(x0, yRoot, x1, yN[ni], n.p1, n.p1, n.color, n.dim, ni === 0);
+    n.kids.forEach((k, ki) => {
+      const dim = hiH && isNonH(k.cat);
+      branch(x1, yN[ni], x2, yL[ni * 2 + ki], catJoint[k.cat], k.p, catColor[k.cat], dim, ki === 0);
+    });
+  });
+  nodes.forEach((n, ni) => nodeBox(x1, yN[ni], n.text, n.color, n.dim));
+  nodes.forEach((n, ni) => n.kids.forEach((k, ki) => {
+    const nm = catNames[k.cat];
+    const label = rev ? nm[1] + ' ∩ ' + nm[0] : nm[0] + ' ∩ ' + nm[1];
+    leaf(x2, yL[ni * 2 + ki], label, catJoint[k.cat], c.counts[k.cat], catColor[k.cat], hiH && isNonH(k.cat));
+  }));
+}
+
+// ─── Draw Dots ────────────────────────────────────────────────────────────────
+function drawDots() {
+  const el = document.getElementById('dot-canvas');
+  const W  = 500;//el.parentElement.clientWidth - 48;
+  const H  = 500;
+  el.width  = W * devicePixelRatio;
+  el.height = H * devicePixelRatio;
+  el.style.width  = W + 'px';
+  el.style.height = H + 'px';
+  const ctx = el.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W, H);
+
+  const c = compute();
+  const [nHE, nHnE, nnHE, nnHnE] = c.counts;
+  const nameH = S.nameH || 'H';
+  const nameE = S.nameE || 'E';
+
+  const showLabels = S.highlightE || S.highlightH;
+  const padY = showLabels ? 18 : 6;
+  const COLS = S.cols, ROWS = S.rows;
+  const N = COLS * ROWS;
+  const padX = 6;
+  const cellW = (W - padX * 2) / COLS;
+  const cellH = (H - padY - 6) / ROWS;
+  const em = Math.min(cellW, cellH);   // taille d'une case
+
+  // Fond bleu pâle = H (les cases forment des zones quand c'est ordonné), pas de fond pour non H.
+  // Cercle rouge = O.
+  const H_BG = '#5bb0e8', H_BG_D = '#d5e9f7';
+  const RING = '#D55E00', RING_D = '#f0c8a8';
+
+  // Émoji vide → petit rond sombre.
+  const emoji = (document.getElementById('emoji').value || '').trim();
+  function person(col, row, cat) {
+    const x = padX + col * cellW, y = padY + row * cellH;
+    const isH = cat < 2, isE = cat === 0 || cat === 2;
+    let dim = false;
+    if (S.showE && S.highlightE && !isE) dim = true;
+    if (S.showE && S.highlightH && !isH) dim = true;
+    if (isH) {
+      ctx.fillStyle = dim ? H_BG_D : H_BG;
+      ctx.fillRect(x, y, cellW + 0.5, cellH + 0.5);
+    }
+    ctx.save();
+    ctx.globalAlpha = dim ? 0.4 : 1;
+    if (emoji) {
+      ctx.font = Math.round(em * 0.78) + 'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#000';
+      ctx.fillText(emoji, x + cellW / 2, y + cellH / 2 + em * 0.05);
+    } else {
+      ctx.beginPath();
+      ctx.arc(x + cellW / 2, y + cellH / 2, em * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+    }
+    ctx.restore();
+    if (S.showE && isE) {
+      ctx.beginPath();
+      ctx.arc(x + cellW / 2, y + cellH / 2, em * 0.45, 0, Math.PI * 2);
+      ctx.strokeStyle = dim ? RING_D : RING;
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+    }
+  }
+
+  function seededShuffle(arr, seed) {
+    let s = seed | 0;
+    for (let i = arr.length - 1; i > 0; i--) {
+      s = Math.imul(s, 1664525) + 1013904223 | 0;
+      const j = (s >>> 0) % (i + 1);
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+  }
+
+  // cat 0=H∩E, 1=H∩non E, 2=non H∩E, 3=non H∩non E
+  const iso = S.highlightE || S.highlightH;
+  if (iso) {
+    // Isoler E / H : groupes séparés par un trait, remplis ligne par ligne
+    const cats = [];
+    if (S.highlightE) {
+      for (let i = 0; i < nHE;   i++) cats.push(0);
+      for (let i = 0; i < nnHE;  i++) cats.push(2);
+      for (let i = 0; i < nHnE;  i++) cats.push(1);
+      for (let i = 0; i < nnHnE; i++) cats.push(3);
+    } else {
+      for (let i = 0; i < nHE;   i++) cats.push(0);
+      for (let i = 0; i < nHnE;  i++) cats.push(1);
+      for (let i = 0; i < nnHnE; i++) cats.push(3);
+      for (let i = 0; i < nnHE;  i++) cats.push(2);
+    }
+    cats.forEach((cat, i) => person(i % COLS, Math.floor(i / COLS), cat));
+  } else if (S.ordered) {
+    // H en colonnes à gauche (remplies de gauche à droite), O empilés depuis le bas
+    const nH = nHE + nHnE;
+    const grid = Array.from({ length: COLS }, () => Array(ROWS).fill(3));   // grid[col][rangDepuisLeBas]
+    const hCells = [], nCells = [];
+    for (let k = 0; k < N; k++) (k < nH ? hCells : nCells).push([Math.floor(k / ROWS), k % ROWS]);
+    function fillGroup(cells, q, catE, catN) {
+      if (!cells.length) return;
+      const byCol = [];
+      cells.forEach(([col, rb]) => {
+        if (!byCol.length || byCol[byCol.length - 1].col !== col) byCol.push({ col, list: [] });
+        byCol[byCol.length - 1].list.push(rb);
+      });
+      // les O sont répartis entre les colonnes au prorata de leur taille
+      let cum = 0, prev = 0;
+      byCol.forEach(g => {
+        cum += g.list.length;
+        const t = Math.round(cum * q / cells.length);
+        const quota = t - prev; prev = t;
+        g.list.forEach((rb, idx) => { grid[g.col][rb] = idx < quota ? catE : catN; });
+      });
+    }
+    fillGroup(hCells, nHE, 0, 1);
+    fillGroup(nCells, nnHE, 2, 3);
+    for (let col = 0; col < COLS; col++)
+      for (let rb = 0; rb < ROWS; rb++) person(col, ROWS - 1 - rb, grid[col][rb]);
+  } else {
+    // Aléatoire : toutes les catégories mélangées (graine fixe → pas de saut visuel)
+    const cats = [].concat(Array(nHE).fill(0), Array(nHnE).fill(1), Array(nnHE).fill(2), Array(nnHnE).fill(3));
+    seededShuffle(cats, 42);
+    cats.forEach((cat, i) => person(i % COLS, Math.floor(i / COLS), cat));
+  }
+
+  // Separator
+  const sepIdx = S.highlightE ? (nHE + nnHE) : S.highlightH ? (nHE + nHnE) : -1;
+  if (sepIdx >= 0) {
+    const sepX = padX + (sepIdx % COLS) * cellW - 1;
+    ctx.beginPath();
+    ctx.moveTo(sepX, padY);
+    ctx.lineTo(sepX, H - 6);
+    ctx.strokeStyle = S.highlightH ? '#d9770688' : '#0072B288';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Group labels
+  if (showLabels) {
+    const leftLabel  = S.highlightH ? nameH : nameE;
+    const rightLabel = S.highlightH ? ('non ' + nameH) : ('non ' + nameE);
+    const leftCount  = S.highlightH ? (nHE + nHnE) : (nHE + nnHE);
+    const rightCount = N - leftCount;
+    const sepX = sepIdx >= 0 ? padX + (sepIdx % COLS) * cellW - 1 : W / 2;
+    const accentColor = S.highlightH ? '#d97706' : '#0072B2';
+
+    ctx.font = '600 9px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = accentColor;
+    ctx.fillText(leftLabel + '  n=' + leftCount, sepX / 2, 12);
+    ctx.fillStyle = '#bbb';
+    ctx.fillText(rightLabel + '  n=' + rightCount, (sepX + W) / 2, 12);
+  }
+}
+
+// ─── Update Stats ─────────────────────────────────────────────────────────────
+function updateStats() {
+  const c = compute();
+  const N = c.N;
+  const nameH = S.nameH || 'H';
+  const nameE = S.nameE || 'E';
+  const nH = 'non ' + nameH, nE = 'non ' + nameE;
+  const [n0, n1, n2, n3] = c.counts;
+
+  // Update total label
+  document.getElementById('total-label').textContent = '= ' + N.toLocaleString('fr') + ' individus';
+
+  // Tableau des effectifs : petit individu (fond bleu = H, cercle rouge = O) + libellé + effectif + %
+  const esc = t => t.replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  const sym = esc((document.getElementById('emoji').value || '').trim() || '●');
+  const ico = (isH, isE) =>
+    `<span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:${isH ? '#5bb0e8' : 'transparent'};">` +
+    `<span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-size:17px; line-height:1; border:3.5px solid ${isE ? '#D55E00' : 'transparent'};">${sym}</span></span>`;
+  const fr = v => v.toFixed(1).replace('.', ',') + ' %';
+  const rows = [
+    [true,  true,  esc(nameH) + ' et ' + esc(nameE), n0],
+    [true,  false, esc(nameH) + ' et ' + esc(nE),    n1],
+    [false, true,  esc(nH) + ' et ' + esc(nameE),    n2],
+    [false, false, esc(nH) + ' et ' + esc(nE),       n3],
+  ];
+  const cell = 'style="border:1px solid #ccc; padding:3px 12px;"';
+  const num = 'style="border:1px solid #ccc; padding:3px 12px; text-align:right; font-family:\'IBM Plex Mono\',monospace;"';
+  document.getElementById('stats-table').innerHTML =
+    '<table style="border-collapse:collapse; font-size:0.85rem;">' +
+    rows.map(([h, e, label, n]) =>
+      `<tr><td ${cell}>${ico(h, e)}</td><td ${cell}>${label}</td><td ${num}>${n}</td><td ${num}>${fr(n * 100 / N)}</td></tr>`
+    ).join('') + '</table>';
+
+  document.getElementById('bayes-line').textContent =
+    `P(${nameH} | ${nameE}) = ${n0} / (${n0} + ${n2}) = ${n0} / ${n0 + n2} = ${fr(c.pHgE * 100)}`;
+
+  // Asymmetry card
+  const card = document.getElementById('asym-card');
+  if (S.highlightH) {
+    card.classList.add('visible');
+    const nHtotal = n0 + n1;
+    const nEtotal = n0 + n2;
+    document.getElementById('asym-pEgH').textContent =
+      `P(${nameE}|${nameH}) = ${(c.pEgH*100).toFixed(1)}%`;
+    document.getElementById('asym-pHgE').textContent =
+      `P(${nameH}|${nameE}) = ${(c.pHgE*100).toFixed(1)}%`;
+    document.getElementById('asym-frac-EgH').textContent =
+      `${n0} / ${nHtotal}  (parmi ${nameH})`;
+    document.getElementById('asym-frac-HgE').textContent =
+      `${n0} / ${nEtotal}  (parmi ${nameE})`;
+  } else {
+    card.classList.remove('visible');
+  }
+}
+
+// ─── URL ?variables=H,O,P(H),P(O|H),P(O|non H),colonnes,lignes,symbole ──────────
+const URL_IDS = ['nameH', 'nameE', 'pH', 'pEgH', 'pEgnH', 'gridCols', 'gridRows', 'emoji'];
+
+function syncUrl() {
+  const v = URL_IDS.map(id => encodeURIComponent(document.getElementById(id).value)).join(',');
+  try { history.replaceState(null, '', '?variables=' + v); } catch (e) {}
+}
+
+function loadFromUrl() {
+  const m = location.search.match(/[?&]variables=([^&]*)/);
+  if (!m) return;
+  m[1].split(',').slice(0, URL_IDS.length).forEach((raw, i) => {
+    let val;
+    try { val = decodeURIComponent(raw); } catch (e) { return; }
+    const el = document.getElementById(URL_IDS[i]);
+    if (el.type === 'number') {
+      const n = parseFloat(val);
+      if (isNaN(n)) return;
+      el.value = n;
+    } else {
+      el.value = val.slice(0, 18);
+    }
+    el.dispatchEvent(new Event('input'));
+  });
+}
+
+// ─── Full update ──────────────────────────────────────────────────────────────
+function updateParamLabels() {
+  const nameH = S.nameH || 'H', nameE = S.nameE || 'O';
+  document.getElementById('hdr-H').textContent  = nameH;
+  document.getElementById('hdr-nH').textContent = 'non ' + nameH;
+  document.getElementById('lik-label').textContent = 'Vraisemblance (' + nameE + ')';
+  document.getElementById('pnH-auto').textContent = Math.round((1 - S.pH) * 100);
+}
+
+function update() {
+  updateParamLabels();
+  syncUrl();
+  if (!document.getElementById('pane-tree').classList.contains('hidden')) drawTree();
+  if (!document.getElementById('pane-diag').classList.contains('hidden')) drawDiagram();
+  drawDots();
+  updateStats();
+}
+
+// ─── Controls ────────────────────────────────────────────────────────────────
+function bindNumber(id, key, transform) {
+  document.getElementById(id).addEventListener('input', function() {
+    const v = parseFloat(this.value);
+    if (!isNaN(v)) {
+      const p = v / 100;
+      S[key] = transform ? transform(p) : Math.max(0.001, Math.min(0.999, p));
+      update();
+    }
+  });
+}
+
+bindNumber('pH',     'pH');
+bindNumber('pEgH',   'pEgH');
+bindNumber('pEgnH',  'pEgnH');
+
+function bindGrid(id, key) {
+  document.getElementById(id).addEventListener('input', function() {
+    const v = parseInt(this.value);
+    if (!isNaN(v) && v >= 2) { S[key] = v; update(); }
+  });
+}
+bindGrid('gridCols', 'cols');
+bindGrid('gridRows', 'rows');
+
+document.getElementById('nameH').addEventListener('input', e => { S.nameH = e.target.value; update(); });
+document.getElementById('nameE').addEventListener('input', e => { S.nameE = e.target.value; update(); });
+document.getElementById('emoji').addEventListener('input', update);
+document.getElementById('ordered').addEventListener('change', function() { S.ordered = this.checked; update(); });
+
+document.getElementById('showE').addEventListener('change', function() {
+  S.showE = this.checked;
+  const show = S.showE;
+  document.getElementById('highlightBtns').style.display   = show ? 'flex'  : 'none';
+  document.getElementById('stats-table').style.display     = show ? 'block' : 'none';
+  document.getElementById('bayes-line').style.display      = show ? 'block' : 'none';
+  if (!show) {
+    S.highlightE = false;
+    S.highlightH = false;
+    document.getElementById('highlightEBtn').classList.remove('active');
+    document.getElementById('highlightHBtn').classList.remove('active');
+    document.getElementById('asym-card').classList.remove('visible');
+  }
+  update();
+});
+
+document.getElementById('highlightEBtn').addEventListener('click', function() {
+  S.highlightE = !S.highlightE;
+  if (S.highlightE) { S.highlightH = false; document.getElementById('highlightHBtn').classList.remove('active'); }
+  this.classList.toggle('active', S.highlightE);
+  update();
+});
+
+document.getElementById('highlightHBtn').addEventListener('click', function() {
+  S.highlightH = !S.highlightH;
+  if (S.highlightH) { S.highlightE = false; document.getElementById('highlightEBtn').classList.remove('active'); }
+  this.classList.toggle('active', S.highlightH);
+  update();
+});
+
+document.getElementById('tree-rev-btn').addEventListener('click', function() {
+  S.reversed = !S.reversed;
+  this.classList.toggle('active', S.reversed);
+  this.textContent = S.reversed ? "Arbre normal (H puis O)" : "Renverser l'arbre";
+  drawTree();
+});
+
+// ─── Diagram helpers ──────────────────────────────────────────────────────────
+function pct(v) { return (v * 100).toFixed(0) + ' %'; }
+
+function hatchRegion(ctx, x, y, w, h) {
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = '#dbeafe';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = '#93c5fd';
+  ctx.lineWidth = 0.9;
+  ctx.beginPath();
+  for (let i = -h; i < w + h; i += 8) {
+    ctx.moveTo(x + i, y);
+    ctx.lineTo(x + i + h, y + h);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function hBrace(ctx, x1, x2, y, label) {
+  const mid = (x1 + x2) / 2, d = 5, tip = 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.bezierCurveTo(x1, y + d, mid - tip, y + d, mid, y + d + tip);
+  ctx.bezierCurveTo(mid + tip, y + d, x2, y + d, x2, y);
+  ctx.strokeStyle = '#6b9fc4'; ctx.lineWidth = 1.3;
+  ctx.stroke(); ctx.restore();
+  ctx.fillStyle = '#444';
+  ctx.font = 'italic 12px IBM Plex Serif, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, mid, y + d + tip + 14);
+}
+
+function vBraceLeft(ctx, x, y1, y2, label) {
+  const mid = (y1 + y2) / 2, d = 5, tip = 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y1);
+  ctx.bezierCurveTo(x - d, y1, x - d, mid - tip, x - d - tip, mid);
+  ctx.bezierCurveTo(x - d, mid + tip, x - d, y2, x, y2);
+  ctx.strokeStyle = '#6b9fc4'; ctx.lineWidth = 1.3;
+  ctx.stroke(); ctx.restore();
+  ctx.fillStyle = '#444';
+  ctx.font = 'italic 12px IBM Plex Serif, serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(label, x - d - tip - 6, mid + 4);
+}
+
+function vBraceRight(ctx, x, y1, y2, label) {
+  const mid = (y1 + y2) / 2, d = 5, tip = 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y1);
+  ctx.bezierCurveTo(x + d, y1, x + d, mid - tip, x + d + tip, mid);
+  ctx.bezierCurveTo(x + d, mid + tip, x + d, y2, x, y2);
+  ctx.strokeStyle = '#6b9fc4'; ctx.lineWidth = 1.3;
+  ctx.stroke(); ctx.restore();
+  ctx.fillStyle = '#444';
+  ctx.font = 'italic 12px IBM Plex Serif, serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(label, x + d + tip + 6, mid + 4);
+}
+
+// ─── Draw Diagram ─────────────────────────────────────────────────────────────
+let diagStep = 1;   // 1 = H seul, 2 = H + O
+
+function drawDiagram() {
+  const el = document.getElementById('diag-canvas');
+  if (!el) return;
+  if (el.parentElement.clientWidth === 0) return;
+  const padL = 58, padR = 58, padT = 28, padB = 46;
+  const rW = 250;
+  const W = padL + rW + padR;
+  const rH = rW;                   // carré
+  const H  = rH + padT + padB;
+  el.width  = W * devicePixelRatio;
+  el.height = H * devicePixelRatio;
+  el.style.width  = W + 'px';
+  el.style.height = H + 'px';
+  const ctx = el.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W, H);
+
+  document.getElementById('diag-f1').innerHTML = '';
+  document.getElementById('diag-f4').innerHTML = '';
+  updateOddsTable();
+  if (diagStep === 0) return;
+
+  const c = compute();
+  const nameH = S.nameH || 'H';
+  const nameE = S.nameE || 'O';
+
+  const rX = padL, rY = padT;
+  const divX = rX + rW * c.pH;
+  const leftW = rW * c.pH;
+  const rightW = rW * c.pnH;
+
+  // ── Étape 1 : colonnes H / non H ──
+  // non H : fond blanc
+  ctx.fillStyle = '#f8f8f8';
+  ctx.fillRect(divX, rY, rightW, rH);
+  // H : hachuré
+  hatchRegion(ctx, rX, rY, leftW, rH);
+
+  // Bordure + séparateur
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(rX, rY, rW, rH);
+  ctx.beginPath(); ctx.moveTo(divX, rY); ctx.lineTo(divX, rY + rH); ctx.stroke();
+
+  // Labels au-dessus
+  ctx.font = 'italic 13px IBM Plex Serif, serif';
+  ctx.fillStyle = '#222'; ctx.textAlign = 'center';
+  ctx.fillText(nameH,         rX + leftW / 2,  rY - 8);
+  ctx.fillText('non ' + nameH,  divX + rightW / 2, rY - 8);
+
+  // Accolades bas
+  hBrace(ctx, rX,    divX,    rY + rH + 4, pct(c.pH));
+  hBrace(ctx, divX,  rX + rW, rY + rH + 4, pct(c.pnH));
+
+  if (diagStep < 2) return;
+
+  // ── Étape 2 : overlay O (bleu transparent par-dessus) ──
+  const oHy  = rY + rH * (1 - c.pEgH);
+  const onHy = rY + rH * (1 - c.pEgnH);
+  const oHh  = rH * c.pEgH;
+  const onHh = rH * c.pEgnH;
+
+  // O ∩ H : overlay bleu sur le hachuré
+  ctx.fillStyle = 'rgba(59,130,246,0.38)';
+  ctx.fillRect(rX, oHy, leftW, oHh);
+  // O ∩ non H : overlay bleu sur le blanc
+  ctx.fillStyle = 'rgba(59,130,246,0.38)';
+  ctx.fillRect(divX, onHy, rightW, onHh);
+
+  // Refaire les bordures par-dessus les couleurs
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(rX, rY, rW, rH);
+  ctx.beginPath(); ctx.moveTo(divX, rY); ctx.lineTo(divX, rY + rH); ctx.stroke();
+  // Trait séparateur O / non O dans chaque colonne
+  ctx.setLineDash([4, 3]); ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(rX,   oHy);  ctx.lineTo(divX,    oHy);  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(divX, onHy); ctx.lineTo(rX + rW, onHy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels O dans les zones colorées
+  ctx.font = 'italic 12px IBM Plex Serif, serif';
+  ctx.fillStyle = '#1d4ed8'; ctx.textAlign = 'center';
+  if (oHh  > 14) ctx.fillText(nameE, rX   + leftW  / 2, oHy  + oHh  / 2 + 4);
+  if (onHh > 14) ctx.fillText(nameE, divX + rightW / 2, onHy + onHh / 2 + 4);
+
+  // Accolades latérales
+  vBraceLeft (ctx, rX,      oHy,  rY + rH, pct(c.pEgH));
+  vBraceRight(ctx, rX + rW, onHy, rY + rH, pct(c.pEgnH));
+
+  updateDiagFormulas();
+}
+
+// ─── Tableau des rapports (odds) ──────────────────────────────────────────────
+function updateOddsTable() {
+  if (typeof katex === 'undefined') return;
+  const c = compute();
+  const H = S.nameH || 'H', E = S.nameE || 'O';
+  const esc = t => t.replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  const tex = lat => katex.renderToString(lat, { throwOnError: false });
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+  const a = Math.round(c.pH * 100), b = 100 - a;
+  const d1 = Math.round(c.pEgH * 100), d2 = Math.round(c.pEgnH * 100);
+  const showO = diagStep >= 2;
+
+  // rapport donné puis simplifié : « 90 : 10 = 9 : 1 »
+  function ratio(x, y) {
+    const g = gcd(x, y) || 1;
+    const sx = x / g, sy = y / g;
+    return { sx, sy, tex: (sx === x && sy === y) ? `${x} : ${y}` : `${x} : ${y} = ${sx} : ${sy}` };
+  }
+  const rPrior = ratio(a, b), rLik = ratio(d1, d2);
+
+  // a posteriori : calculé avec les rapports simplifiés
+  // produit en facteur : on omet les 1, et on met des parenthèses autour d'un vrai produit
+  const prod = (x, y) => x === 1 ? `${y}` : y === 1 ? `${x}` : `(${x}\\cdot ${y})`;
+  const num = rPrior.sx * rLik.sx, den = rPrior.sy * rLik.sy, g = gcd(num, den) || 1;
+  const simp = `${num / g} : ${den / g}`;
+  const raw = `${prod(rPrior.sx, rLik.sx)} : ${prod(rPrior.sy, rLik.sy)}`;
+  const post = raw === simp ? simp : `${raw} = ${simp}`;
+
+  const td = 'style="border:1px solid #444; padding:7px 14px;"';
+  const tdc = 'style="border:1px solid #444; padding:7px 14px; text-align:center; min-width:210px;"';
+  document.getElementById('odds-table').innerHTML = `
+    <table style="border-collapse:collapse; font-size:0.85rem;">
+      <tr><td ${td}></td><td ${tdc}>${esc(H)} <em>versus</em> non ${esc(H)}</td></tr>
+      <tr><td ${td}>A priori</td><td ${tdc}>${tex(rPrior.tex)}</td></tr>
+      <tr><td ${td}>Vraisemblance (${esc(E)})</td><td ${tdc}>${showO ? tex(rLik.tex) : '&nbsp;'}</td></tr>
+      <tr><td ${td}>A posteriori</td><td ${tdc}>${showO ? tex(post) : '&nbsp;'}</td></tr>
+    </table>`;
+}
+
+// ─── Diagram formulas ─────────────────────────────────────────────────────────
+function updateDiagFormulas() {
+  const c = compute();
+  const H = S.nameH || 'H', E = S.nameE || 'O';
+
+  function texName(s) { return s.replace(/[\\{}_^$&#%~]/g, '\\$&'); }
+  const Ht  = `\\text{${texName(H)}}`;
+  const nHt = `\\overline{\\text{${texName(H)}}}`;
+  const Et  = `\\text{${texName(E)}}`;
+
+  const pv = v => (v * 100).toFixed(0) + '\\%';
+  const pH_s = pv(c.pH), pnH_s = pv(c.pnH);
+  const pOgH_s = pv(c.pEgH), pOgnH_s = pv(c.pEgnH);
+  const res = pv(c.pHgE);
+
+  // ── Sous le diagramme : formule de Bayes ──
+  const f1 = `P\\!\\left(${Ht}\\,/\\,${Et}\\right) = \\dfrac{${pH_s}\\cdot ${pOgH_s}}{${pH_s}\\cdot ${pOgH_s}+${pnH_s}\\cdot ${pOgnH_s}} \\approx ${res}`;
+
+  // ── Sous le tableau : raisonnement par rapports (odds) ──
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  const pH_pct    = Math.round(c.pH    * 100);
+  const pnH_pct   = 100 - pH_pct;
+  const pOgH_pct  = Math.round(c.pEgH  * 100);
+  const pOgnH_pct = Math.round(c.pEgnH * 100);
+  const numRaw = pH_pct * pOgH_pct;
+  const denRaw = pnH_pct * pOgnH_pct;
+  const g    = gcd(numRaw, denRaw);
+  const numR = numRaw / g, denR = denRaw / g;
+
+  const f4 = `P\\!\\left(${Ht}\\,/\\,${Et}\\right) = \\dfrac{${numR}}{${numR}+${denR}} = \\dfrac{${numR}}{${numR + denR}} \\approx ${res}`;
+
+  katex.render(f1, document.getElementById('diag-f1'), { throwOnError: false, displayMode: true });
+  katex.render(f4, document.getElementById('diag-f4'), { throwOnError: false, displayMode: true });
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+document.getElementById('tab-viz').addEventListener('click', function() {
+  ['tab-tree','tab-diag'].forEach(id => document.getElementById(id).classList.remove('active'));
+  this.classList.add('active');
+  document.getElementById('pane-tree').classList.add('hidden');
+  document.getElementById('pane-diag').classList.add('hidden');
+  document.getElementById('pane-viz').classList.remove('hidden');
+});
+
+document.getElementById('tab-tree').addEventListener('click', function() {
+  ['tab-viz','tab-diag'].forEach(id => document.getElementById(id).classList.remove('active'));
+  this.classList.add('active');
+  document.getElementById('pane-viz').classList.add('hidden');
+  document.getElementById('pane-diag').classList.add('hidden');
+  document.getElementById('pane-tree').classList.remove('hidden');
+  drawTree();
+});
+
+document.getElementById('tab-diag').addEventListener('click', function() {
+  ['tab-viz','tab-tree'].forEach(id => document.getElementById(id).classList.remove('active'));
+  this.classList.add('active');
+  document.getElementById('pane-viz').classList.add('hidden');
+  document.getElementById('pane-tree').classList.add('hidden');
+  document.getElementById('pane-diag').classList.remove('hidden');
+  drawDiagram();
+});
+
+document.getElementById('diag-showO').addEventListener('change', function() {
+  diagStep = this.checked ? 2 : 1;
+  drawDiagram();
+});
+
+window.addEventListener('resize', update);
+document.querySelectorAll('.emoji-btn').forEach(btn => btn.addEventListener('click', () => {
+  const inp = document.getElementById('emoji');
+  inp.value = btn.textContent;
+  inp.dispatchEvent(new Event('input'));
+}));
+loadFromUrl();
+update();
+</script>
+</body>
+</html>
