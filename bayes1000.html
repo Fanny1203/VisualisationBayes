@@ -17,10 +17,6 @@
     --border: #e2e2e2;
     --text: #1a1a1a;
     --muted: #999;
-    --c1: #0072B2;
-    --c2: #2b8cc4;
-    --c3: #D55E00;
-    --c4t: #CC8A00;
     --accent: #0072B2;
   }
 
@@ -50,11 +46,6 @@
     text-transform: uppercase;
   }
 
-  header span {
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
-
   .main {
     display: grid;
     grid-template-columns: 30fr 70fr;
@@ -78,24 +69,6 @@
     margin-bottom: 2px;
   }
 
-  .name-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .name-field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .name-field label {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 0.75rem;
-    color: #333;
-  }
-
   input[type=text] {
     background: var(--bg2);
     border: 1px solid var(--border);
@@ -108,25 +81,6 @@
     transition: border-color 0.2s;
   }
   input[type=text]:focus { border-color: var(--accent); }
-
-  .params {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .param-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .param-label {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 0.8rem;
-    color: #333;
-  }
 
   input[type=number] {
     background: var(--bg2);
@@ -167,74 +121,6 @@
 
   canvas { display: block; width: 100%; }
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-
-  .stat-box {
-    background: var(--bg2);
-    border-radius: 4px;
-    border-left: 3px solid;
-    padding: 7px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .stat-box .s-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
-
-  .stat-box .s-count {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.0rem;
-    font-weight: 600;
-  }
-
-  .stat-box .s-pct {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-  }
-
-  .bayes-card {
-    background: #f3f8fc;
-    border: 1px solid var(--accent);
-    border-radius: 5px;
-    padding: 13px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .bayes-card .b-header {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.14em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  .bayes-card .b-formula {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: #666;
-  }
-
-  .bayes-card .b-value {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-
   .tab-bar {
     display: flex;
     border-bottom: 1px solid var(--border);
@@ -257,8 +143,6 @@
   .tab-pane { display: flex; flex-direction: column; gap: 14px; }
   .tab-pane.hidden { display: none !important; }
 
-  .btn-row { display: flex; gap: 6px; }
-
   .highlight-btn {
     background: none;
     border: 1px solid var(--border);
@@ -271,9 +155,6 @@
     transition: all 0.2s;
   }
   .highlight-btn:hover { border-color: #aaa; color: #555; }
-  #highlightEBtn.active  { border-color: var(--accent); color: var(--accent); background: #eef6fb; }
-  #highlightHBtn.active  { border-color: #d97706;       color: #d97706;       background: #fffbf0; }
-
   .show-e-row {
     display: flex;
     align-items: center;
@@ -291,93 +172,12 @@
     cursor: pointer;
   }
 
-  /* Asymmetry card */
-  .asym-card {
-    background: #fffbf0;
-    border: 1px solid #f0c060;
-    border-radius: 5px;
-    padding: 11px 14px;
-    display: none;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .asym-card.visible { display: flex; }
-
-  .asym-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.14em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  .asym-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .asym-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .asym-direction {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.58rem;
-    color: #bbb;
-    letter-spacing: 0.06em;
-  }
-
-  .asym-val {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.0rem;
-    font-weight: 600;
-  }
-
-  .asym-frac {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.62rem;
-    color: #aaa;
-  }
-
-  .asym-tree .asym-val  { color: #0072B2; }
-  .asym-bayes .asym-val { color: #1a1a1a; }
-
-  .asym-neq {
-    font-size: 1.4rem;
-    color: #d97706;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  /* Formules diagramme */
-  .dfrac {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    vertical-align: middle;
-    line-height: 1.25;
-  }
-  .dfrac .dn { border-bottom: 1px solid #555; padding-bottom: 1px; white-space: nowrap; }
-  .dfrac .dd { padding-top: 1px; white-space: nowrap; }
-  .formula-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.82rem;
-    color: #333;
-  }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Probabilités Conditionnelles</h1>
-  <span>Visualisation sur 1 000 individus</span>
 </header>
 
 <div class="main">
@@ -502,10 +302,6 @@
         <input type="number" id="gridRows" min="2" max="200" step="1" value="10" style="width:50px">
         <span class="section-label" id="total-label" style="margin-left:4px;">= 100 individus</span>
       </div>
-      <div class="btn-row" id="highlightBtns" style="display:none">
-        <button class="highlight-btn" id="highlightEBtn">Isoler E</button>
-        <button class="highlight-btn" id="highlightHBtn">Isoler H</button>
-      </div>
     </div>
 
     <canvas id="dot-canvas"></canvas>
@@ -514,22 +310,6 @@
 
     <div id="bayes-line" style="display:none; font-size:0.9rem;"></div>
 
-    <div class="asym-card" id="asym-card">
-      <div class="asym-title">Asymétrie de la conditionnelle</div>
-      <div class="asym-row">
-        <div class="asym-item asym-tree">
-          <div class="asym-direction">Lecture arbre →</div>
-          <div class="asym-val" id="asym-pEgH">—</div>
-          <div class="asym-frac" id="asym-frac-EgH">—</div>
-        </div>
-        <div class="asym-neq">≠</div>
-        <div class="asym-item asym-bayes">
-          <div class="asym-direction">Lecture inverse ←</div>
-          <div class="asym-val" id="asym-pHgE">—</div>
-          <div class="asym-frac" id="asym-frac-HgE">—</div>
-        </div>
-      </div>
-    </div><!-- /asym-card -->
     </div><!-- /pane-viz -->
 
     <!-- Tab: Arbre -->
@@ -544,7 +324,6 @@
         <label class="show-e-row">
           <input type="checkbox" id="diag-showO" autocomplete="off"> Afficher O
         </label>
-        <span id="diag-step-lbl" style="font-size:0.72rem; color:var(--muted)"></span>
       </div>
       <div style="display:flex; align-items:flex-start; gap:28px; flex-wrap:wrap;">
         <div>
@@ -568,8 +347,6 @@ const S = {
   nameH: 'Malade', nameE: 'Test +',
   ordered: false,
   showE: false,
-  highlightE: false,
-  highlightH: false,
   cols: 10, rows: 10,
   reversed: false,
 };
@@ -618,15 +395,16 @@ function drawTree() {
   ctx.fillRect(0, 0, W, H);
 
   const c    = compute();
-  const hiH  = S.highlightH;
   const rev  = S.reversed;
   const nameH = S.nameH || 'H';
   const nameE = S.nameE || 'E';
   const nH = 'non ' + nameH;
   const nE = 'non ' + nameE;
-  const DIM = '#d8d8d8';
   const NEUTRAL = '#333';
-  const fmt = p => (p * 100).toFixed((p * 100) % 1 ? 1 : 0).replace('.', ',') + ' %';
+  const fmt = p => {
+    const v = Math.round(p * 1000) / 10;   // évite « 9,0 % » dû aux erreurs de flottants
+    return (Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ',')) + ' %';
+  };
 
   const leafW = W * 0.42;
   const x0 = 14, x2 = W - leafW;
@@ -642,29 +420,28 @@ function drawTree() {
   const catColor = [C.HE, C.HnE, C.nHE, C.nHnE];
   const catJoint = [c.pHE, c.pHnE, c.pnHE, c.pnHnE];
   const catNames = [[nameH, nameE], [nameH, nE], [nH, nameE], [nH, nE]];
-  const isNonH = cat => cat >= 2;
 
   // Niveau 1 + enfants. p1 = prob. du nœud ; p = prob. conditionnelle (affichée) ;
   // l'épaisseur du 2e niveau est pondérée par la proba jointe (= p1 × p).
   const pHgE  = c.pE > 0 ? c.pHE / c.pE : 0;
   const pHgnE = (1 - c.pE) > 0 ? c.pHnE / (1 - c.pE) : 0;
   const nodes = rev ? [
-    { text: nameE, p1: c.pE,     color: NEUTRAL, dim: false,
+    { text: nameE, p1: c.pE,     color: NEUTRAL,
       kids: [{ p: pHgE,  cat: 0 }, { p: 1 - pHgE,  cat: 2 }] },
-    { text: nE,    p1: 1 - c.pE, color: NEUTRAL, dim: false,
+    { text: nE,    p1: 1 - c.pE, color: NEUTRAL,
       kids: [{ p: pHgnE, cat: 1 }, { p: 1 - pHgnE, cat: 3 }] },
   ] : [
-    { text: nameH, p1: c.pH,  color: C.HE,  dim: false,
+    { text: nameH, p1: c.pH,  color: C.HE,
       kids: [{ p: c.pEgH,  cat: 0 }, { p: 1 - c.pEgH,  cat: 1 }] },
-    { text: nH,    p1: c.pnH, color: C.nHE, dim: hiH,
+    { text: nH,    p1: c.pnH, color: C.nHE,
       kids: [{ p: c.pEgnH, cat: 2 }, { p: 1 - c.pEgnH, cat: 3 }] },
   ];
 
-  function branch(ax, ay, bx, by, wProb, labelProb, color, dim, labelUp) {
+  function branch(ax, ay, bx, by, wProb, labelProb, color, labelUp) {
     ctx.beginPath();
     ctx.moveTo(ax, ay);
     ctx.lineTo(bx, by);
-    ctx.strokeStyle = dim ? DIM : '#333';
+    ctx.strokeStyle = '#333';
     ctx.lineWidth = width(wProb);
     ctx.lineCap = 'round';
     ctx.stroke();
@@ -679,11 +456,11 @@ function drawTree() {
     const ty = my + (labelUp ? -width(wProb) / 2 - 8 : width(wProb) / 2 + 15);
     const txt = fmt(labelProb);
     ctx.strokeText(txt, mx, ty);
-    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.fillStyle = color;
     ctx.fillText(txt, mx, ty);
   }
 
-  function nodeBox(x, y, text, color, dim) {
+  function nodeBox(x, y, text, color) {
     ctx.font = '600 13px IBM Plex Sans, sans-serif';
     const w = ctx.measureText(text).width + 16, h = 24;
     ctx.beginPath();
@@ -691,17 +468,17 @@ function drawTree() {
     ctx.fillStyle = '#fff';
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = dim ? DIM : color;
+    ctx.strokeStyle = color;
     ctx.stroke();
-    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.fillText(text, x, y + 5);
   }
 
-  function leaf(x, y, label, prob, count, color, dim) {
+  function leaf(x, y, label, prob, count, color) {
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = dim ? DIM : '#333';
+    ctx.fillStyle = '#333';
     ctx.fill();
     ctx.textAlign = 'left';
     // réduit la police si le libellé dépasse la place disponible
@@ -709,10 +486,10 @@ function drawTree() {
     let fs = 13;
     do { ctx.font = `600 ${fs}px IBM Plex Sans, sans-serif`; fs -= 0.5; }
     while (ctx.measureText(label).width > avail && fs > 8);
-    ctx.fillStyle = dim ? '#bbb' : color;
+    ctx.fillStyle = color;
     ctx.fillText(label, x + 11, y - 2);
     ctx.font = '11px IBM Plex Mono, monospace';
-    ctx.fillStyle = dim ? '#ccc' : '#555';
+    ctx.fillStyle = '#555';
     ctx.fillText(fmt(prob) + ' · n=' + count, x + 11, y + 13);
   }
 
@@ -724,17 +501,15 @@ function drawTree() {
 
   // Branches (d'abord toutes, puis nœuds et feuilles par-dessus)
   nodes.forEach((n, ni) => {
-    branch(x0, yRoot, x1, yN[ni], n.p1, n.p1, n.color, n.dim, ni === 0);
-    n.kids.forEach((k, ki) => {
-      const dim = hiH && isNonH(k.cat);
-      branch(x1, yN[ni], x2, yL[ni * 2 + ki], catJoint[k.cat], k.p, catColor[k.cat], dim, ki === 0);
-    });
+    branch(x0, yRoot, x1, yN[ni], n.p1, n.p1, n.color, ni === 0);
+    n.kids.forEach((k, ki) =>
+      branch(x1, yN[ni], x2, yL[ni * 2 + ki], catJoint[k.cat], k.p, catColor[k.cat], ki === 0));
   });
-  nodes.forEach((n, ni) => nodeBox(x1, yN[ni], n.text, n.color, n.dim));
+  nodes.forEach((n, ni) => nodeBox(x1, yN[ni], n.text, n.color));
   nodes.forEach((n, ni) => n.kids.forEach((k, ki) => {
     const nm = catNames[k.cat];
     const label = rev ? nm[1] + ' ∩ ' + nm[0] : nm[0] + ' ∩ ' + nm[1];
-    leaf(x2, yL[ni * 2 + ki], label, catJoint[k.cat], c.counts[k.cat], catColor[k.cat], hiH && isNonH(k.cat));
+    leaf(x2, yL[ni * 2 + ki], label, catJoint[k.cat], c.counts[k.cat], catColor[k.cat]);
   }));
 }
 
@@ -755,11 +530,7 @@ function drawDots() {
 
   const c = compute();
   const [nHE, nHnE, nnHE, nnHnE] = c.counts;
-  const nameH = S.nameH || 'H';
-  const nameE = S.nameE || 'E';
-
-  const showLabels = S.highlightE || S.highlightH;
-  const padY = showLabels ? 18 : 6;
+  const padY = 6;
   const COLS = S.cols, ROWS = S.rows;
   const N = COLS * ROWS;
   const padX = 6;
@@ -769,23 +540,18 @@ function drawDots() {
 
   // Fond bleu pâle = H (les cases forment des zones quand c'est ordonné), pas de fond pour non H.
   // Cercle rouge = O.
-  const H_BG = '#5bb0e8', H_BG_D = '#d5e9f7';
-  const RING = '#D55E00', RING_D = '#f0c8a8';
+  const H_BG = '#5bb0e8';
+  const RING = '#D55E00';
 
   // Émoji vide → petit rond sombre.
   const emoji = (document.getElementById('emoji').value || '').trim();
   function person(col, row, cat) {
     const x = padX + col * cellW, y = padY + row * cellH;
     const isH = cat < 2, isE = cat === 0 || cat === 2;
-    let dim = false;
-    if (S.showE && S.highlightE && !isE) dim = true;
-    if (S.showE && S.highlightH && !isH) dim = true;
     if (isH) {
-      ctx.fillStyle = dim ? H_BG_D : H_BG;
+      ctx.fillStyle = H_BG;
       ctx.fillRect(x, y, cellW + 0.5, cellH + 0.5);
     }
-    ctx.save();
-    ctx.globalAlpha = dim ? 0.4 : 1;
     if (emoji) {
       ctx.font = Math.round(em * 0.78) + 'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
       ctx.textAlign = 'center';
@@ -798,11 +564,10 @@ function drawDots() {
       ctx.fillStyle = '#333';
       ctx.fill();
     }
-    ctx.restore();
     if (S.showE && isE) {
       ctx.beginPath();
       ctx.arc(x + cellW / 2, y + cellH / 2, em * 0.45, 0, Math.PI * 2);
-      ctx.strokeStyle = dim ? RING_D : RING;
+      ctx.strokeStyle = RING;
       ctx.lineWidth = 3.5;
       ctx.stroke();
     }
@@ -818,23 +583,7 @@ function drawDots() {
   }
 
   // cat 0=H∩E, 1=H∩non E, 2=non H∩E, 3=non H∩non E
-  const iso = S.highlightE || S.highlightH;
-  if (iso) {
-    // Isoler E / H : groupes séparés par un trait, remplis ligne par ligne
-    const cats = [];
-    if (S.highlightE) {
-      for (let i = 0; i < nHE;   i++) cats.push(0);
-      for (let i = 0; i < nnHE;  i++) cats.push(2);
-      for (let i = 0; i < nHnE;  i++) cats.push(1);
-      for (let i = 0; i < nnHnE; i++) cats.push(3);
-    } else {
-      for (let i = 0; i < nHE;   i++) cats.push(0);
-      for (let i = 0; i < nHnE;  i++) cats.push(1);
-      for (let i = 0; i < nnHnE; i++) cats.push(3);
-      for (let i = 0; i < nnHE;  i++) cats.push(2);
-    }
-    cats.forEach((cat, i) => person(i % COLS, Math.floor(i / COLS), cat));
-  } else if (S.ordered) {
+  if (S.ordered) {
     // H en colonnes à gauche (remplies de gauche à droite), O empilés depuis le bas
     const nH = nHE + nHnE;
     const grid = Array.from({ length: COLS }, () => Array(ROWS).fill(3));   // grid[col][rangDepuisLeBas]
@@ -867,36 +616,6 @@ function drawDots() {
     cats.forEach((cat, i) => person(i % COLS, Math.floor(i / COLS), cat));
   }
 
-  // Separator
-  const sepIdx = S.highlightE ? (nHE + nnHE) : S.highlightH ? (nHE + nHnE) : -1;
-  if (sepIdx >= 0) {
-    const sepX = padX + (sepIdx % COLS) * cellW - 1;
-    ctx.beginPath();
-    ctx.moveTo(sepX, padY);
-    ctx.lineTo(sepX, H - 6);
-    ctx.strokeStyle = S.highlightH ? '#d9770688' : '#0072B288';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 3]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // Group labels
-  if (showLabels) {
-    const leftLabel  = S.highlightH ? nameH : nameE;
-    const rightLabel = S.highlightH ? ('non ' + nameH) : ('non ' + nameE);
-    const leftCount  = S.highlightH ? (nHE + nHnE) : (nHE + nnHE);
-    const rightCount = N - leftCount;
-    const sepX = sepIdx >= 0 ? padX + (sepIdx % COLS) * cellW - 1 : W / 2;
-    const accentColor = S.highlightH ? '#d97706' : '#0072B2';
-
-    ctx.font = '600 9px IBM Plex Mono';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = accentColor;
-    ctx.fillText(leftLabel + '  n=' + leftCount, sepX / 2, 12);
-    ctx.fillStyle = '#bbb';
-    ctx.fillText(rightLabel + '  n=' + rightCount, (sepX + W) / 2, 12);
-  }
 }
 
 // ─── Update Stats ─────────────────────────────────────────────────────────────
@@ -935,23 +654,6 @@ function updateStats() {
   document.getElementById('bayes-line').textContent =
     `P(${nameH} | ${nameE}) = ${n0} / (${n0} + ${n2}) = ${n0} / ${n0 + n2} = ${fr(c.pHgE * 100)}`;
 
-  // Asymmetry card
-  const card = document.getElementById('asym-card');
-  if (S.highlightH) {
-    card.classList.add('visible');
-    const nHtotal = n0 + n1;
-    const nEtotal = n0 + n2;
-    document.getElementById('asym-pEgH').textContent =
-      `P(${nameE}|${nameH}) = ${(c.pEgH*100).toFixed(1)}%`;
-    document.getElementById('asym-pHgE').textContent =
-      `P(${nameH}|${nameE}) = ${(c.pHgE*100).toFixed(1)}%`;
-    document.getElementById('asym-frac-EgH').textContent =
-      `${n0} / ${nHtotal}  (parmi ${nameH})`;
-    document.getElementById('asym-frac-HgE').textContent =
-      `${n0} / ${nEtotal}  (parmi ${nameE})`;
-  } else {
-    card.classList.remove('visible');
-  }
 }
 
 // ─── URL ?variables=H,O,P(H),P(O|H),P(O|non H),colonnes,lignes,symbole ──────────
@@ -1031,30 +733,8 @@ document.getElementById('ordered').addEventListener('change', function() { S.ord
 document.getElementById('showE').addEventListener('change', function() {
   S.showE = this.checked;
   const show = S.showE;
-  document.getElementById('highlightBtns').style.display   = show ? 'flex'  : 'none';
   document.getElementById('stats-table').style.display     = show ? 'block' : 'none';
   document.getElementById('bayes-line').style.display      = show ? 'block' : 'none';
-  if (!show) {
-    S.highlightE = false;
-    S.highlightH = false;
-    document.getElementById('highlightEBtn').classList.remove('active');
-    document.getElementById('highlightHBtn').classList.remove('active');
-    document.getElementById('asym-card').classList.remove('visible');
-  }
-  update();
-});
-
-document.getElementById('highlightEBtn').addEventListener('click', function() {
-  S.highlightE = !S.highlightE;
-  if (S.highlightE) { S.highlightH = false; document.getElementById('highlightHBtn').classList.remove('active'); }
-  this.classList.toggle('active', S.highlightE);
-  update();
-});
-
-document.getElementById('highlightHBtn').addEventListener('click', function() {
-  S.highlightH = !S.highlightH;
-  if (S.highlightH) { S.highlightE = false; document.getElementById('highlightEBtn').classList.remove('active'); }
-  this.classList.toggle('active', S.highlightH);
   update();
 });
 
@@ -1153,7 +833,6 @@ function drawDiagram() {
   document.getElementById('diag-f1').innerHTML = '';
   document.getElementById('diag-f4').innerHTML = '';
   updateOddsTable();
-  if (diagStep === 0) return;
 
   const c = compute();
   const nameH = S.nameH || 'H';
@@ -1271,7 +950,6 @@ function updateDiagFormulas() {
 
   function texName(s) { return s.replace(/[\\{}_^$&#%~]/g, '\\$&'); }
   const Ht  = `\\text{${texName(H)}}`;
-  const nHt = `\\overline{\\text{${texName(H)}}}`;
   const Et  = `\\text{${texName(E)}}`;
 
   const pv = v => (v * 100).toFixed(0) + '\\%';
