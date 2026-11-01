@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Petits mondes</title>
+<style>
+  :root {
+    --h: #00b050;        /* mondes où H est vraie (allumés) */
+    --nh: #64748b;       /* mondes où H est fausse (allumés) */
+    --h-pale: #a7e3be;   /* mondes où H est vraie (éteints) */
+    --nh-pale: #e2e8f0;  /* mondes où H est fausse (éteints) */
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --bg: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  .outils { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; align-items: center; }
+  .esp { flex: 1; }
+  button { font: inherit; font-size: .9rem; padding: 6px 11px; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #fff; color: var(--ink); cursor: pointer; }
+  button:hover:not(:disabled) { border-color: #94a3b8; }
+  button.actif { border-color: var(--ink); font-weight: 700; }
+  button:disabled { opacity: .35; cursor: default; }
+  #btnH { color: var(--h); }
+  #btnO { color: var(--nh); }
+
+  #grille { display: grid; gap: 3px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  /* Teinte = H ou non H ; intensité = l'observation « allume » le monde. */
+  /* Codage redondant : forme = H (carré) ; point blanc = observation. La couleur ne fait que renforcer. */
+  .m { position: relative; aspect-ratio: 1; border-radius: 50%; background: var(--nh-pale); transition: opacity .45s, background-color .15s, border-radius .15s; }
+  .m.h { background: var(--h-pale); border-radius: 14%; }
+  .m.o::after { content: ""; position: absolute; inset: 31%; border-radius: 50%; background: #fff; }
+  .m.o { background: var(--nh); }
+  .m.h.o { background: var(--h); }
+  #grille.revele .m:not(.o) { opacity: .08; }
+
+  .legende { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: .85rem; color: var(--muted); }
+  .legende > span { display: inline-flex; align-items: center; gap: 5px; }
+  .pt { position: relative; display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--nh-pale); }
+  .pt.h { background: var(--h-pale); border-radius: 14%; }
+  .pt.no { background: var(--nh); }
+  .pt.no::after { content: ""; position: absolute; inset: 31%; border-radius: 50%; background: #fff; }
+
+  .barres { margin-top: 12px; display: grid; gap: 6px; }
+  .ligne { display: grid; grid-template-columns: 3.5em 1fr; gap: 8px; align-items: center; font-size: .85rem; color: var(--muted); }
+  .barre { height: 14px; border-radius: 7px; background: var(--nh-pale); overflow: hidden; }
+  .barre span { display: block; height: 100%; width: 0; background: var(--h); transition: width .45s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="outils">
+    <button id="btnH" class="actif" title="Peindre les mondes où l'hypothèse est vraie"></button>
+    <button id="btnO" title="Peindre les mondes où l'on ferait l'observation"></button>
+    <button id="btnObs" title="Ne garder que les mondes compatibles avec l'observation">Observer</button>
+    <button id="btnRepartir" title="Repartir avec les proportions des mondes restants">Repartir</button>
+    <span class="esp"></span>
+    <button id="btnAnnuler" title="Annuler">↶</button>
+    <button id="btnReset" title="Tout recommencer">⟲</button>
+  </div>
+
+  <div id="grille"></div>
+
+  <div class="legende">
+    <span><i class="pt h"></i><span id="legH"></span></span>
+    <span><i class="pt"></i><span id="legNH"></span></span>
+    <span><i class="pt no"></i><span id="legO"></span></span>
+  </div>
+
+  <div class="barres">
+    <div class="ligne"><span>avant</span><div class="barre"><span id="avant"></span></div></div>
+    <div class="ligne" id="ligneApres"><span>après</span><div class="barre"><span id="apres"></span></div></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* Paramètres d'URL :
+       h  = nom de l'hypothèse        (défaut « H »)
+       nh = nom du contraire          (défaut « non » + h)
+       o  = nom de l'observation      (défaut « Observation »)
+       n  = côté de la grille, 4 à 20 (défaut 10, soit 100 mondes) */
+  const p = new URLSearchParams(location.search);
+  const N = Math.min(20, Math.max(4, parseInt(p.get('n'), 10) || 10));
+  const T = N * N;
+  const nomH  = p.get('h')  || 'H';
+  const nomNH = p.get('nh') || ('non ' + nomH);
+  const nomO  = p.get('o')  || 'Observation';
+
+  const $ = id => document.getElementById(id);
+  $('btnH').textContent = '■ ' + nomH;
+  $('btnO').textContent = '◉ ' + nomO;
+  $('legH').textContent = nomH;
+  $('legNH').textContent = nomNH;
+  $('legO').textContent = nomO;
+
+  /* État */
+  let H = Array(T).fill(false);   // le monde i est un monde « H vraie »
+  let O = Array(T).fill(false);   // dans le monde i, on fait l'observation
+  let mode = 'h';                 // pinceau actif : 'h' ou 'o'
+  let revele = false;             // mondes sans observation estompés
+  let hVerrouille = false;        // après « Repartir », l'a priori n'est plus à peindre
+  let hist = [];
+
+  /* Grille (indice i = ligne * N + colonne, ligne 0 en haut) */
+  const grille = $('grille');
+  grille.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+  const cases = [];
+  for (let i = 0; i < T; i++) {
+    const d = document.createElement('div');
+    d.className = 'm';
+    d.dataset.i = i;
+    grille.appendChild(d);
+    cases.push(d);
+  }
+
+  /* Ordre de rangement : colonne par colonne depuis la gauche, de bas en haut */
+  const ordre = [];
+  for (let c = 0; c < N; c++) for (let r = N - 1; r >= 0; r--) ordre.push(r * N + c);
+
+  const compte = f => { let n = 0; for (let i = 0; i < T; i++) if (f(i)) n++; return n; };
+
+  function sauver() {
+    hist.push({ H: H.slice(), O: O.slice(), mode, revele, hVerrouille });
+    if (hist.length > 60) hist.shift();
+  }
+
+  function rendre() {
+    cases.forEach((d, i) => { d.classList.toggle('h', H[i]); d.classList.toggle('o', O[i]); });
+    grille.classList.toggle('revele', revele);
+
+    $('btnH').classList.toggle('actif', mode === 'h' && !revele);
+    $('btnO').classList.toggle('actif', mode === 'o' && !revele);
+    $('btnH').disabled = revele || hVerrouille;
+    $('btnO').disabled = revele;
+
+    const nO = compte(i => O[i]);
+    $('btnObs').disabled = revele || nO === 0;
+    $('btnRepartir').disabled = !revele;
+    $('btnAnnuler').disabled = hist.length === 0;
+
+    $('avant').style.width = (100 * compte(i => H[i]) / T) + '%';
+    const hO = compte(i => H[i] && O[i]);
+    $('apres').style.width = (revele && nO ? 100 * hO / nO : 0) + '%';
+    $('ligneApres').style.visibility = revele ? 'visible' : 'hidden';
+  }
+
+  /* Peinture au glisser : la première case touchée décide si l'on peint ou si l'on efface */
+  let peint = null;
+  // Case calculée depuis la position (et non elementFromPoint) : les coins et les
+  // interstices entre les ronds comptent aussi, sinon le glisser « saute » des mondes.
+  function caseSous(e) {
+    const r = grille.getBoundingClientRect();
+    const c = Math.floor((e.clientX - r.left) / r.width * N);
+    const l = Math.floor((e.clientY - r.top) / r.height * N);
+    return (c < 0 || c >= N || l < 0 || l >= N) ? null : l * N + c;
+  }
+  function appliquer(i) {
+    if (i === null) return;
+    const t = mode === 'h' ? H : O;
+    if (t[i] !== peint) { t[i] = peint; rendre(); }
+  }
+  grille.addEventListener('pointerdown', e => {
+    if (revele || (mode === 'h' && hVerrouille)) return;
+    const i = caseSous(e);
+    if (i === null) return;
+    e.preventDefault();
+    sauver();
+    peint = !(mode === 'h' ? H : O)[i];
+    appliquer(i);
+    grille.setPointerCapture(e.pointerId);
+  });
+  grille.addEventListener('pointermove', e => { if (peint !== null) appliquer(caseSous(e)); });
+  ['pointerup', 'pointercancel'].forEach(t => grille.addEventListener(t, () => { peint = null; }));
+
+  /* Boutons */
+  $('btnH').onclick = () => { mode = 'h'; rendre(); };
+  $('btnO').onclick = () => { mode = 'o'; rendre(); };
+
+  $('btnObs').onclick = () => { sauver(); revele = true; rendre(); };
+
+  $('btnRepartir').onclick = () => {
+    const hO = compte(i => H[i] && O[i]);
+    const nO = compte(i => !H[i] && O[i]);
+    if (hO + nO === 0) return;
+    sauver();
+    let h = Math.round(T * hO / (hO + nO));
+    // l'arrondi ne doit jamais éliminer une hypothèse qui a survécu
+    if (hO > 0 && h === 0) h = 1;
+    if (nO > 0 && h === T) h = T - 1;
+    H = Array(T).fill(false); O = Array(T).fill(false);
+    ordre.slice(0, h).forEach(i => H[i] = true);
+    revele = false; mode = 'o'; hVerrouille = true;
+    rendre();
+  };
+
+  $('btnAnnuler').onclick = () => {
+    const s = hist.pop();
+    if (!s) return;
+    ({ H, O, mode, revele, hVerrouille } = s);
+    rendre();
+  };
+
+  $('btnReset').onclick = () => {
+    H = Array(T).fill(false); O = Array(T).fill(false);
+    mode = 'h'; revele = false; hVerrouille = false; hist = [];
+    rendre();
+  };
+
+  rendre();
+})();
+</script>
+</body>
+</html>
