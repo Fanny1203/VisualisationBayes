@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Petits mondes</title>
+<title>Observation Bayesienne</title>
 <style>
   :root {
-    --h: #00b050;        /* mondes où H est vraie (allumés) */
-    --nh: #64748b;       /* mondes où H est fausse (allumés) */
-    --h-pale: #a7e3be;   /* mondes où H est vraie (éteints) */
-    --nh-pale: #e2e8f0;  /* mondes où H est fausse (éteints) */
+    --h: #00b050;        /* cas où H est vraie (allumés) */
+    --nh: #64748b;       /* cas où H est fausse (allumés) */
+    --h-pale: #a7e3be;   /* cas où H est vraie (éteints) */
+    --nh-pale: #e2e8f0;  /* cas où H est fausse (éteints) */
     --ink: #1f2937;
     --muted: #6b7280;
     --bg: #ffffff;
@@ -28,7 +28,7 @@
   #btnO { color: var(--nh); }
 
   #grille { display: grid; gap: 3px; touch-action: none; user-select: none; -webkit-user-select: none; }
-  /* Teinte = H ou non H ; intensité = l'observation « allume » le monde. */
+  /* Teinte = H ou non H ; intensité = l'observation « allume » le cas. */
   /* Codage redondant : forme = H (carré) ; point blanc = observation. La couleur ne fait que renforcer. */
   .m { position: relative; aspect-ratio: 1; border-radius: 50%; background: var(--nh-pale); transition: opacity .45s, background-color .15s, border-radius .15s; }
   .m.h { background: var(--h-pale); border-radius: 14%; }
@@ -53,10 +53,10 @@
 <body>
 <div class="wrap">
   <div class="outils">
-    <button id="btnH" class="actif" title="Peindre les mondes où l'hypothèse est vraie"></button>
-    <button id="btnO" title="Peindre les mondes où l'on ferait l'observation"></button>
-    <button id="btnObs" title="Ne garder que les mondes compatibles avec l'observation">Observer</button>
-    <button id="btnRepartir" title="Repartir avec les proportions des mondes restants">Repartir</button>
+    <button id="btnH" class="actif" title="Peindre les cas où l'hypothèse est vraie"></button>
+    <button id="btnO" title="Peindre les cas où l'on ferait l'observation"></button>
+    <button id="btnObs" title="Ne garder que les cas compatibles avec l'observation">Observer</button>
+    <button id="btnRepartir" title="Repartir avec les cas restants">Repartir</button>
     <button id="btnGif" title="Télécharger un GIF : hypothèse, observation, élimination, repartir">⬇ GIF</button>
     <span class="esp"></span>
     <button id="btnAnnuler" title="Annuler">↶</button>
@@ -83,7 +83,7 @@
        h  = nom de l'hypothèse        (défaut « H »)
        nh = nom du contraire          (défaut « non » + h)
        o  = nom de l'observation      (défaut « Observation »)
-       n  = côté de la grille, 4 à 20 (défaut 10, soit 100 mondes) */
+       n  = côté de la grille, 4 à 20 (défaut 10, soit 100 cas) */
   const p = new URLSearchParams(location.search);
   const N = Math.min(20, Math.max(4, parseInt(p.get('n'), 10) || 10));
   const T = N * N;
@@ -99,10 +99,10 @@
   $('legO').textContent = nomO;
 
   /* État */
-  let H = Array(T).fill(false);   // le monde i est un monde « H vraie »
-  let O = Array(T).fill(false);   // dans le monde i, on fait l'observation
+  let H = Array(T).fill(false);   // le cas i est un cas « H vraie »
+  let O = Array(T).fill(false);   // dans le cas i, on fait l'observation
   let mode = 'h';                 // pinceau actif : 'h' ou 'o'
-  let revele = false;             // mondes sans observation estompés
+  let revele = false;             // cas sans observation estompés
   let hVerrouille = false;        // après « Repartir », l'a priori n'est plus à peindre
   let hist = [];
 
@@ -153,7 +153,7 @@
   /* Peinture au glisser : la première case touchée décide si l'on peint ou si l'on efface */
   let peint = null;
   // Case calculée depuis la position (et non elementFromPoint) : les coins et les
-  // interstices entre les ronds comptent aussi, sinon le glisser « saute » des mondes.
+  // interstices entre les ronds comptent aussi, sinon le glisser « saute » des cas.
   function caseSous(e) {
     const r = grille.getBoundingClientRect();
     const c = Math.floor((e.clientX - r.left) / r.width * N);
@@ -184,7 +184,7 @@
 
   $('btnObs').onclick = () => { sauver(); revele = true; rendre(); };
 
-  /* Nouvel a priori après élimination : les proportions des mondes restants, rangées dans la grille */
+  /* Nouvel a priori après élimination : les proportions des cas restants, rangées dans la grille */
   function hRepartis() {
     const hO = compte(i => H[i] && O[i]);
     const nO = compte(i => !H[i] && O[i]);
@@ -334,12 +334,12 @@
     const gif = encoderGif([
       [image('1. Hypothèse de départ', H, vide, false, nH / T, null), 1500],
       [image("2. On fait l'observation", H, O, false, nH / T, null), 1500],
-      [image("3. On élimine les mondes sans l'observation", H, O, true, nH / T, hO / nO), 2200],
-      [image('4. On repart des mondes restants', nouv, vide, false, compte(i => nouv[i]) / T, null), 2500],
+      [image("3. On élimine ce qui est contraire à l'observation", H, O, true, nH / T, hO / nO), 2200],
+      [image('4. On repart des cas restants', nouv, vide, false, compte(i => nouv[i]) / T, null), 2500],
     ]);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([gif], { type: 'image/gif' }));
-    a.download = 'petits-mondes.gif';
+    a.download = 'bayes.gif';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
