@@ -211,9 +211,25 @@
   const css = getComputedStyle(document.documentElement);
   const col = n => css.getPropertyValue(n).trim();
   const POLICE = 'system-ui, "Segoe UI", sans-serif';
-  const IW = 480, IM = 12, IG = IW - 2 * IM, IT = 48, IH = IT + IG + 12 + 2 * 26 + 4;
+  const IW = 480, IM = 12, IG = IW - 2 * IM, IT = 48, LH = 22;
+  let IH = 0;   // hauteur de l'image, fixée à l'export selon le nombre de lignes de légende
 
-  function image(titre, Hh, Oo, estompe, avant, apres) {
+  /* Légende sous la grille : seulement ce qui est dessiné dans l'image */
+  const LEG = { h: nomH, nh: nomNH, o: nomO };
+  function lignesLegende(x, cles) {
+    x.font = '14px ' + POLICE;
+    const lignes = [[]];
+    let larg = 0;
+    cles.forEach(k => {
+      const w = 24 + x.measureText(LEG[k]).width + 16;
+      if (larg + w > IW - 2 * IM + 16 && lignes[lignes.length - 1].length) { lignes.push([]); larg = 0; }
+      lignes[lignes.length - 1].push([k, larg]);
+      larg += w;
+    });
+    return lignes;
+  }
+
+  function image(titre, Hh, Oo, estompe, avant, apres, cles) {
     const c = document.createElement('canvas');
     c.width = IW; c.height = IH;
     const x = c.getContext('2d', { willReadFrequently: true });
@@ -235,9 +251,22 @@
     }
     x.globalAlpha = 1;
 
+    const lignes = lignesLegende(x, cles);
+    lignes.forEach((l, j) => l.forEach(([k, dx]) => {
+      const lx = IM + dx, ly = IT + IG + 8 + j * LH, r = 8, cy = ly + LH / 2;
+      if (k === 'h') { x.fillStyle = col('--h-pale'); x.beginPath(); x.roundRect(lx, cy - r, 2 * r, 2 * r, 3); x.fill(); }
+      else {
+        x.fillStyle = col(k === 'o' ? '--nh' : '--nh-pale'); x.beginPath(); x.arc(lx + r, cy, r, 0, 2 * Math.PI); x.fill();
+        if (k === 'o') { x.fillStyle = '#fff'; x.beginPath(); x.arc(lx + r, cy, 3, 0, 2 * Math.PI); x.fill(); }
+      }
+      x.fillStyle = col('--muted'); x.font = '14px ' + POLICE;
+      x.fillText(LEG[k], lx + 24, cy);
+    }));
+    const yb = IT + IG + 8 + lignes.length * LH + 6;
+
     const bw = IW - 72 - IM - 52;
     const barre = (k, nom, f) => {
-      const y = IT + IG + 12 + k * 26;
+      const y = yb + k * 26;
       x.fillStyle = col('--nh-pale'); x.beginPath(); x.roundRect(72, y, bw, 14, 7); x.fill();
       if (f > 0) { x.fillStyle = col('--h'); x.beginPath(); x.roundRect(72, y, bw * f, 14, 7); x.fill(); }
       x.fillStyle = col('--muted'); x.font = '14px ' + POLICE;
@@ -331,11 +360,15 @@
     const nouv = hRepartis();
     if (!nouv) return;
     const vide = Array(T).fill(false);
+    const c0 = document.createElement('canvas').getContext('2d');
+    const deux = ['h', 'nh'], trois = ['h', 'nh', 'o'];
+    const nl = Math.max(lignesLegende(c0, deux).length, lignesLegende(c0, trois).length);
+    IH = IT + IG + 8 + nl * LH + 6 + 2 * 26 + 4;
     const gif = encoderGif([
-      [image('1. Hypothèse de départ', H, vide, false, nH / T, null), 1500],
-      [image("2. On fait l'observation", H, O, false, nH / T, null), 1500],
-      [image("3. On élimine ce qui est contraire à l'observation", H, O, true, nH / T, hO / nO), 2200],
-      [image('4. On repart des cas restants', nouv, vide, false, compte(i => nouv[i]) / T, null), 2500],
+      [image('1. Hypothèse de départ', H, vide, false, nH / T, null, deux), 1500],
+      [image("2. On fait l'observation", H, O, false, nH / T, null, trois), 1500],
+      [image("3. On élimine ce qui est contraire à l'observation", H, O, true, nH / T, hO / nO, trois), 2200],
+      [image('4. On repart des cas restants', nouv, vide, false, compte(i => nouv[i]) / T, null, deux), 2500],
     ]);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([gif], { type: 'image/gif' }));
